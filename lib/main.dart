@@ -80,21 +80,24 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter = _counter % 3;
       //keep updating this value based on how many tracks there are
       if (_counter == 0) {
+        pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
         msgAudio = "Ocean Waves";
       }
       if (_counter == 1) {
+        pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
         msgAudio = "Nightscapes";
       }
       if (_counter == 2) {
+        pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
         msgAudio = "Aircraft";
       }
     });
   }
 
-  bool playAudio() {
+  bool playButtonAudio() {
     setState(() {
       if (playing) {
         playing = false;
@@ -102,6 +105,16 @@ class _MyHomePageState extends State<MyHomePage> {
       } else {
         playing = true;
         myAudioPlayer.play();
+      }
+    });
+    return playing;
+  }
+
+  bool pauseAudio() {
+    setState(() {
+      if (playing) {
+        playing = false;
+        myAudioPlayer.pause();
       }
     });
     return playing;
@@ -151,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             ElevatedButton(
-              onPressed: playAudio,
+              onPressed: playButtonAudio,
               child: const Icon(
                 Icons.play_arrow,
                 color: Colors.black,
