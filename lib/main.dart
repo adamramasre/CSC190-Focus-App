@@ -60,6 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
+    myAudioPlayer.setLoopMode(LoopMode.all);
   }
 
   @override
@@ -82,16 +83,19 @@ class _MyHomePageState extends State<MyHomePage> {
       if (_counter == 0) {
         pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
+        myAudioPlayer.setLoopMode(LoopMode.one);
         msgAudio = "Ocean Waves";
       }
       if (_counter == 1) {
         pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
+        myAudioPlayer.setLoopMode(LoopMode.one);
         msgAudio = "Nightscapes";
       }
       if (_counter == 2) {
         pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
+        myAudioPlayer.setLoopMode(LoopMode.one);
         msgAudio = "Aircraft";
       }
     });
