@@ -11,9 +11,13 @@ This project is a starting point for the focus and motivation application.
 ## how run?
 
 - Install Flutter SDK (https://docs.flutter.dev/get-started/install)
-- cd into the focus_app folder
+  - Extract the downloaded zip file
+  - Make a new folder at "C:\src\"
+  - move the folder named "flutter" within the extracted folder to the location (the path of "C:\src\flutter\" should be available now)
+  - add "C:\src\flutter\bin" to your PATH ('env' in windows search should bring it up)
+- Download, extract, and cd into the CSC190-Focus-App folder
 - "flutter run"
-- Use the corresponding options to select either Chrome or Edge
+- Use the corresponding options in the terminal to select either Chrome or Edge
 - App will appear in browser window after some time
 
 
