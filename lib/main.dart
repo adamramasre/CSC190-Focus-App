@@ -8,8 +8,6 @@ void main() {
   runApp(const MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -51,20 +49,21 @@ class MyHomePage extends StatefulWidget {
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
-
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   bool playing = false;
+  String msgAudio = "Ocean Waves";
   late AudioPlayer myAudioPlayer;
   @override
-  void initState(){
+  void initState() {
     super.initState();
     myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
   }
+
   @override
-  void dispose(){
+  void dispose() {
     myAudioPlayer.dispose();
     super.dispose();
   }
@@ -76,21 +75,34 @@ class _MyHomePageState extends State<MyHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
+
       _counter++;
+      _counter = _counter % 3;
+      //keep updating this value based on how many tracks there are
+      if (_counter == 0) {
+        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
+        msgAudio = "Ocean Waves";
+      }
+      if (_counter == 1) {
+        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
+        msgAudio = "Nightscapes";
+      }
+      if (_counter == 2) {
+        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
+        msgAudio = "Aircraft";
+      }
     });
   }
 
-  bool playAudio(){
+  bool playAudio() {
     setState(() {
-      if(playing) {
-        playing=false;
+      if (playing) {
+        playing = false;
         myAudioPlayer.pause();
-
-      }else{
-        playing=true;
+      } else {
+        playing = true;
         myAudioPlayer.play();
       }
-
     });
     return playing;
   }
@@ -130,28 +142,29 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              "Ocean Waves",
+            Text(
+              msgAudio,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             ElevatedButton(
-
               onPressed: playAudio,
               child: const Icon(
                 Icons.play_arrow,
                 color: Colors.black,
                 size: 12.0,
               ),
-
             ),
           ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        child: Container(height: 50.0,),
+        child: Container(
+          height: 50.0,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
