@@ -52,6 +52,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int trackCount = 3;
   int _counter = 0;
   bool playing = false;
   String msgAudio = "Ocean Waves";
@@ -78,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
 
       _counter++;
-      _counter = _counter % 3;
+      _counter = _counter % trackCount;
       //keep updating this value based on how many tracks there are
       if (_counter == 0) {
         pauseAudio();
