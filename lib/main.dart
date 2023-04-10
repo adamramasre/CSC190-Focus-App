@@ -52,6 +52,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  int selectedNavigationBarIndex = 0;
   int trackCount = 3;
   int _counter = 0;
   bool playing = false;
@@ -86,14 +87,42 @@ class _MyHomePageState extends State<MyHomePage> {
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
         myAudioPlayer.setLoopMode(LoopMode.one);
         msgAudio = "Ocean Waves";
-      }
-      if (_counter == 1) {
+      } else if (_counter == 1) {
         pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
         myAudioPlayer.setLoopMode(LoopMode.one);
         msgAudio = "Nightscapes";
+      } else if (_counter == 2) {
+        pauseAudio();
+        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
+        myAudioPlayer.setLoopMode(LoopMode.one);
+        msgAudio = "Aircraft";
       }
-      if (_counter == 2) {
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+
+      _counter--;
+      _counter = _counter % trackCount;
+      //keep updating this value based on how many tracks there are
+      if (_counter == 0) {
+        pauseAudio();
+        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
+        myAudioPlayer.setLoopMode(LoopMode.one);
+        msgAudio = "Ocean Waves";
+      } else if (_counter == 1) {
+        pauseAudio();
+        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
+        myAudioPlayer.setLoopMode(LoopMode.one);
+        msgAudio = "Nightscapes";
+      } else if (_counter == 2) {
         pauseAudio();
         myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
         myAudioPlayer.setLoopMode(LoopMode.one);
@@ -123,6 +152,12 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     return playing;
+  }
+
+  void selectNavigationBarIndex(int index) {
+    setState(() {
+      selectedNavigationBarIndex = index;
+    });
   }
 
   @override
@@ -160,29 +195,52 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            TextButton(
+                onPressed: _incrementCounter,
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        const Color.fromARGB(255, 227, 241, 21))),
+                child: const Text("Next Track")),
+            TextButton(
+                onPressed: _incrementCounter,
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        const Color.fromARGB(255, 245, 139, 0))),
+                child: const Text("Previous Track")),
+            Text(
+              'Track $_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             Text(
               msgAudio,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            ElevatedButton(
+            TextButton(
               onPressed: playButtonAudio,
-              child: const Icon(
-                Icons.play_arrow,
-                color: Colors.black,
-                size: 12.0,
-              ),
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                      const Color.fromARGB(255, 114, 87, 236))),
+              child: playing == true
+                  ? const Icon(Icons.pause)
+                  : const Icon(Icons.play_arrow),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Container(
-          height: 50.0,
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Player & Quotes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.school),
+            label: 'Add Quotes',
+          ),
+        ],
+        currentIndex: selectedNavigationBarIndex,
+        selectedItemColor: Colors.amber[800],
+        onTap: selectNavigationBarIndex,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
@@ -192,3 +250,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+
+/* To-Do
+
+- implement a countdown timer that auto pauses the music whenever it is done
+- change the background based on the track playing
+- implement a drop down menu that allows you to see all tracks and select one
+- make a bank of quotes, and display one at random at the top of the page
+- use the increment button to create a dialogue to add more quotes, 
+        or 
+    use the bottom nav bar to make a text box to add quotes
+- change the color of the text and icons from blue to black or any other suitable color
+
+
+
+
+*/
