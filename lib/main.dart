@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         const Color.fromARGB(255, 227, 241, 21))),
                 child: const Text("Next Track")),
             TextButton(
-                onPressed: _incrementCounter,
+                onPressed: _decrementCounter,
                 style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(
                         const Color.fromARGB(255, 245, 139, 0))),
