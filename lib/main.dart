@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'dart:async';
+import 'dart:io';
+import 'dart:async' show Future;
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:convert';
+import "dart:math";
+import 'dart:core';
 //import 'package:audio_session/audio_session.dart';
 //import 'package:flutter/services.dart';
 //import 'package:rxdart/rxdart.dart';
@@ -56,19 +65,41 @@ class _MyHomePageState extends State<MyHomePage> {
   int trackCount = 3;
   int _counter = 0;
   bool playing = false;
-  String msgAudio = "Ocean Waves";
   late AudioPlayer myAudioPlayer;
+  String imageLink = "images/waves.jpg";
+  String selectedValue = "0";
+  String msgAudio = "Ocean Waves";
+  String quoteToDisplay = "Never give up.";
+  String data = "";
+
+  fetchFileData() async {
+    String responseText;
+    responseText = await rootBundle.loadString('text/quotes.txt');
+
+    setState(() {
+      data = responseText;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
     myAudioPlayer.setLoopMode(LoopMode.all);
+    fetchFileData();
+    super.initState();
   }
 
   @override
   void dispose() {
     myAudioPlayer.dispose();
     super.dispose();
+  }
+
+  T getRandomElement<T>(List<T> list) {
+    final random = new Random();
+    var i = random.nextInt(list.length);
+    return list[i];
   }
 
   void _incrementCounter() {
@@ -81,23 +112,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
       _counter++;
       _counter = _counter % trackCount;
+      selectedValue = _counter.toString();
       //keep updating this value based on how many tracks there are
-      if (_counter == 0) {
-        pauseAudio();
-        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
-        myAudioPlayer.setLoopMode(LoopMode.one);
-        msgAudio = "Ocean Waves";
-      } else if (_counter == 1) {
-        pauseAudio();
-        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
-        myAudioPlayer.setLoopMode(LoopMode.one);
-        msgAudio = "Nightscapes";
-      } else if (_counter == 2) {
-        pauseAudio();
-        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
-        myAudioPlayer.setLoopMode(LoopMode.one);
-        msgAudio = "Aircraft";
-      }
+      counterHelper(_counter);
     });
   }
 
@@ -111,24 +128,33 @@ class _MyHomePageState extends State<MyHomePage> {
 
       _counter--;
       _counter = _counter % trackCount;
+      selectedValue = _counter.toString();
       //keep updating this value based on how many tracks there are
-      if (_counter == 0) {
-        pauseAudio();
-        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
-        myAudioPlayer.setLoopMode(LoopMode.one);
-        msgAudio = "Ocean Waves";
-      } else if (_counter == 1) {
-        pauseAudio();
-        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
-        myAudioPlayer.setLoopMode(LoopMode.one);
-        msgAudio = "Nightscapes";
-      } else if (_counter == 2) {
-        pauseAudio();
-        myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
-        myAudioPlayer.setLoopMode(LoopMode.one);
-        msgAudio = "Aircraft";
-      }
+      counterHelper(_counter);
     });
+  }
+
+  void counterHelper(int counterNumber) {
+    //only call this function within setState()
+    if (counterNumber == 0) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "Ocean Waves";
+      imageLink = "images/waves.jpg";
+    } else if (counterNumber == 1) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "Nightscapes";
+      imageLink = "images/nightscapes.jpg";
+    } else if (counterNumber == 2) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "Aircraft";
+      imageLink = "images/airplane.jpg";
+    }
   }
 
   bool playButtonAudio() {
@@ -160,6 +186,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void updateSelectedValue(String updatedVal) {
+    selectedValue = updatedVal;
+  }
+
+  List<DropdownMenuItem<String>> get dropdownItems {
+    List<DropdownMenuItem<String>> menuItems = [
+      DropdownMenuItem(child: Text("Ocean Waves"), value: "0"),
+      DropdownMenuItem(child: Text("Nightscapes"), value: "1"),
+      DropdownMenuItem(child: Text("Airplane"), value: "2"),
+      //DropdownMenuItem(child: Text("England"),value: "England"),
+    ];
+    return menuItems;
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -181,9 +221,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
           child: Container(
         constraints: BoxConstraints.expand(),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             image: DecorationImage(
-          image: AssetImage("images/waves.jpg"),
+          image: AssetImage(imageLink),
           fit: BoxFit.cover,
         )),
         child: Column(
@@ -203,18 +243,21 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            TextButton(
-                onPressed: _incrementCounter,
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        const Color.fromARGB(255, 227, 241, 21))),
-                child: const Text("Next Track")),
-            TextButton(
-                onPressed: _decrementCounter,
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        const Color.fromARGB(255, 245, 139, 0))),
-                child: const Text("Previous Track")),
+            Text(
+              quoteToDisplay,
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            SizedBox(height: 50),
+            DropdownButton(
+                value: selectedValue,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedValue = newValue!;
+                    _counter = int.parse(selectedValue);
+                    counterHelper(_counter);
+                  });
+                },
+                items: dropdownItems),
             Text(
               'Track $_counter',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -223,14 +266,31 @@ class _MyHomePageState extends State<MyHomePage> {
               msgAudio,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            TextButton(
-              onPressed: playButtonAudio,
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      const Color.fromARGB(255, 114, 87, 236))),
-              child: playing == true
-                  ? const Icon(Icons.pause)
-                  : const Icon(Icons.play_arrow),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextButton(
+                    onPressed: _decrementCounter,
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 245, 139, 0))),
+                    child: const Text("Previous")),
+                TextButton(
+                  onPressed: playButtonAudio,
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color.fromARGB(255, 114, 87, 236))),
+                  child: playing == true
+                      ? const Icon(Icons.pause)
+                      : const Icon(Icons.play_arrow),
+                ),
+                TextButton(
+                    onPressed: _incrementCounter,
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 227, 241, 21))),
+                    child: const Text("Next")),
+              ],
             ),
           ],
         ),
