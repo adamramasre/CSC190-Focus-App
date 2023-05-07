@@ -194,7 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<DropdownMenuItem<String>> menuItems = [
       DropdownMenuItem(child: Text("Ocean Waves"), value: "0"),
       DropdownMenuItem(child: Text("Nightscapes"), value: "1"),
-      DropdownMenuItem(child: Text("Airplane"), value: "2"),
+      DropdownMenuItem(child: Text("Aircraft"), value: "2"),
       //DropdownMenuItem(child: Text("England"),value: "England"),
     ];
     return menuItems;
