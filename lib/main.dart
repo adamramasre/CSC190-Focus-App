@@ -72,6 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String quoteToDisplay = "Never give up.";
   String data = "";
 
+  var quotes = ['Never give up.','Just do it.','I am inevitable.','You are perfect.'];
+
   fetchFileData() async {
     String responseText;
     responseText = await rootBundle.loadString('text/quotes.txt');
@@ -220,6 +222,18 @@ class _MyHomePageState extends State<MyHomePage> {
     selectedValue = updatedVal;
   }
 
+  void generateRandomQuote(){
+    setState(() {
+      final _random = new Random();
+
+      // generate a random index based on the list length
+      // and use it to retrieve the element
+      quoteToDisplay = quotes[_random.nextInt(quotes.length)];
+    });
+    
+
+  }
+
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
       DropdownMenuItem(child: Text("Ocean Waves"), value: "0"),
@@ -282,6 +296,13 @@ class _MyHomePageState extends State<MyHomePage> {
               quoteToDisplay,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            SizedBox(height: 20),
+            TextButton(
+                    onPressed: generateRandomQuote,
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 227, 241, 21))),
+                    child: const Text("Random Quote")),
             SizedBox(height: 50),
             DropdownButton(
                 value: selectedValue,
