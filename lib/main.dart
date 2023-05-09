@@ -62,7 +62,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int selectedNavigationBarIndex = 0;
-  int trackCount = 3;
+  int trackCount = 8;
   int _counter = 0;
   bool playing = false;
   late AudioPlayer myAudioPlayer;
@@ -154,6 +154,36 @@ class _MyHomePageState extends State<MyHomePage> {
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Aircraft";
       imageLink = "images/airplane.jpg";
+    } else if (counterNumber == 3) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/air-conditioner.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "Air Conditioner";
+      imageLink = "images/air-conditioner.jpg";
+    } else if (counterNumber == 4) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/arctic-wind.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "Arctic Wind";
+      imageLink = "images/arctic-wind.jpg";
+    } else if (counterNumber == 5) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/birds.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "Birds";
+      imageLink = "images/birds.jpg";
+    } else if (counterNumber == 6) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/city.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "City";
+      imageLink = "images/city.jpg";
+    } else if (counterNumber == 7) {
+      pauseAudio();
+      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/underwater.mp3");
+      myAudioPlayer.setLoopMode(LoopMode.one);
+      msgAudio = "Underwater";
+      imageLink = "images/underwater.jpg";
     }
   }
 
@@ -195,7 +225,12 @@ class _MyHomePageState extends State<MyHomePage> {
       DropdownMenuItem(child: Text("Ocean Waves"), value: "0"),
       DropdownMenuItem(child: Text("Nightscapes"), value: "1"),
       DropdownMenuItem(child: Text("Aircraft"), value: "2"),
-      //DropdownMenuItem(child: Text("England"),value: "England"),
+      DropdownMenuItem(child: Text("Air Conditioner"), value: "3"),
+      DropdownMenuItem(child: Text("Arctic Wind"), value: "4"),
+      DropdownMenuItem(child: Text("Birds"), value: "5"),
+      DropdownMenuItem(child: Text("City"), value: "6"),
+      DropdownMenuItem(child: Text("Underwater"), value: "7"),
+      
     ];
     return menuItems;
   }
