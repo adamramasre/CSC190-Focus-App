@@ -233,6 +233,39 @@ class _MyHomePageState extends State<MyHomePage> {
     
 
   }
+  int secondsRemaining = 5;
+  Timer? timer;
+  void _startCountDown(){
+    timer = Timer.periodic(Duration(seconds:1),(_){
+      if(secondsRemaining>0){
+        setState(() {
+          secondsRemaining--;
+        });
+      }
+      else{
+        _stopTimer();
+      }
+    });
+      
+  }
+
+
+  void _stopTimer(){
+    timer?.cancel();
+  }
+
+  void _increaseSeconds(){
+    setState(() {
+      secondsRemaining++;
+    });
+  }
+
+  void _decreaseSeconds(){
+    setState(() {
+      secondsRemaining--;
+    });
+    
+  }
 
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
@@ -248,6 +281,8 @@ class _MyHomePageState extends State<MyHomePage> {
     ];
     return menuItems;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -348,6 +383,52 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: const Text("Next")),
               ],
             ),
+            Text(
+              secondsRemaining.toString(),
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children:<Widget>[
+                MaterialButton(
+                  onPressed: _stopTimer,
+                  child:Text(
+                    'Pause',
+                    style: secondsRemaining>0 ? TextStyle(color: Colors.green) : TextStyle(color: Colors.red)
+                  ),
+                  color: Colors.deepPurple,
+
+                ),
+                MaterialButton(
+                  onPressed: _startCountDown,
+                  child:Text(
+                    'START',
+                    style: secondsRemaining == 0 ? TextStyle(color: Colors.white) : TextStyle(color: Colors.green)
+                  ),
+                  color: Colors.deepPurple,
+
+                ),
+                MaterialButton(
+                  onPressed: _increaseSeconds,
+                  child:Text(
+                    '+Second',
+                    style: secondsRemaining == 0 ? TextStyle(color: Colors.white) : TextStyle(color: Colors.green)
+                  ),
+                  color: Colors.deepPurple,
+
+                ),
+                MaterialButton(
+                  onPressed: _decreaseSeconds,
+                  child:Text(
+                    '-Second',
+                    style: secondsRemaining == 0 ? TextStyle(color: Colors.white) : TextStyle(color: Colors.green)
+                  ),
+                  color: Colors.deepPurple,
+
+                ),
+
+              ]
+            )
           ],
         ),
       )),
