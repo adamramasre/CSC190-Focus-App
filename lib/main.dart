@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   bool playing = false;
   late AudioPlayer myAudioPlayer;
-  String imageLink = "images/waves.jpg";
+  String imageLink = "assets/images/waves.jpg";
   String selectedValue = "0";
   String msgAudio = "Ocean Waves";
   String quoteToDisplay = "Never give up.";
@@ -143,49 +143,49 @@ class _MyHomePageState extends State<MyHomePage> {
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Ocean Waves";
-      imageLink = "images/waves.jpg";
+      imageLink = "assets/images/waves.jpg";
     } else if (counterNumber == 1) {
       pauseAudio();
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/nightscapes.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Nightscapes";
-      imageLink = "images/nightscapes.jpg";
+      imageLink = "assets/images/nightscapes.jpg";
     } else if (counterNumber == 2) {
       pauseAudio();
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/aircraft.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Aircraft";
-      imageLink = "images/airplane.jpg";
+      imageLink = "assets/images/airplane.jpg";
     } else if (counterNumber == 3) {
       pauseAudio();
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/air-conditioner.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Air Conditioner";
-      imageLink = "images/air-conditioner.jpg";
+      imageLink = "assets/images/air-conditioner.jpg";
     } else if (counterNumber == 4) {
       pauseAudio();
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/arctic-wind.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Arctic Wind";
-      imageLink = "images/arctic-wind.jpg";
+      imageLink = "assets/images/arctic-wind.jpg";
     } else if (counterNumber == 5) {
       pauseAudio();
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/birds.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Birds";
-      imageLink = "images/birds.jpg";
+      imageLink = "assets/images/birds.jpg";
     } else if (counterNumber == 6) {
       pauseAudio();
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/city.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "City";
-      imageLink = "images/city.jpg";
+      imageLink = "assets/images/city.jpg";
     } else if (counterNumber == 7) {
       pauseAudio();
       myAudioPlayer = AudioPlayer()..setAsset("assets/audio/underwater.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Underwater";
-      imageLink = "images/underwater.jpg";
+      imageLink = "assets/images/underwater.jpg";
     }
   }
 
