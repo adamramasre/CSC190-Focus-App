@@ -9,9 +9,45 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import "dart:math";
 import 'dart:core';
+
+import 'package:file_picker/file_picker.dart';
+
 //import 'package:audio_session/audio_session.dart';
 //import 'package:flutter/services.dart';
 //import 'package:rxdart/rxdart.dart';
+class CounterStorage {
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/counter.txt');
+  }
+
+  Future<File> writeQuote(String quoteToAppend) async {
+    final file = await _localFile;
+    return file.writeAsString('\n$quoteToAppend');
+  }
+}
+
+class Quote {
+  late String text;
+  late String author;
+
+  Quote({
+    required this.text,
+    required this.author,
+  });
+
+  factory Quote.fromJson(Map<String, dynamic> json) {
+    return Quote(
+      text: json['text'],
+      author: json['author'],
+    );
+  }
+}
 
 void main() {
   runApp(const MyApp());
@@ -37,13 +73,14 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Focus & Motivation Home Page'),
+      home: MyHomePage(title: 'Focus & Motivation Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  final CounterStorage storage = CounterStorage();
+  MyHomePage({super.key, required this.title});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -70,16 +107,28 @@ class _MyHomePageState extends State<MyHomePage> {
   String selectedValue = "0";
   String msgAudio = "Ocean Waves";
   String quoteToDisplay = "Never give up.";
-  String data = "";
+  late Future<String> data;
   String selectedTimerValue = "0";
   String quoteToAdd = "";
+  final file = File('assets/text/quotes.txt');
 
   List<String> quotes = [
     'Never give up.',
     'Just do it.',
     'I am inevitable.',
     'You are perfect.'
-  ];
+  ]; //hardcoded quotes if file not present
+
+  writingTime() {
+    // doesnt work properly
+    widget.storage.writeQuote(quoteToAdd);
+  }
+
+  getData() async {
+    String txtfile = await rootBundle.loadString('assets/text/quotes.txt');
+    LineSplitter ls = new LineSplitter();
+    quotes = ls.convert(txtfile);
+  }
 
   addQuote() {
     setState(() {
@@ -88,22 +137,26 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  fetchFileData() async {
-    String responseText;
-    responseText = await rootBundle.loadString('text/quotes.txt');
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
 
-    setState(() {
-      data = responseText;
-    });
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/counter.txt');
   }
 
   late TextEditingController controller;
+
   @override
   void initState() {
     super.initState();
+
     myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
     myAudioPlayer.setLoopMode(LoopMode.all);
-    //fetchFileData();
+    getData();
     super.initState();
     controller = TextEditingController();
   }
@@ -296,7 +349,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _resetTimer() {
     _stopTimer();
     setState(() {
-      secondsRemaining = 0;
+      secondsRemaining = 30;
     });
   }
 
@@ -462,7 +515,11 @@ class _MyHomePageState extends State<MyHomePage> {
             children: <Widget>[
               Text(
                 quoteToDisplay, // change back after testing
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: TextStyle(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 20,
+                  color: Colors.orangeAccent,
+                ),
               ),
               SizedBox(height: 20),
               TextButton(
@@ -474,7 +531,10 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(height: 50),
               DropdownButton(
                   value: selectedValue,
-                  style: Theme.of(context).textTheme.headlineMedium,
+                  style: TextStyle(
+                      color: Colors.black, //Font color
+                      fontSize: 20 //font size on dropdown button
+                      ),
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedValue = newValue!;
@@ -523,12 +583,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      "Presets: ",
-                      selectionColor: Colors.orange,
-                      style: Theme.of(context).textTheme.headlineMedium,
+                      "Timer Presets: ",
+                      selectionColor: Colors.black,
+                      style: TextStyle(
+                        color: Colors.black, //Font color
+                        fontSize: 20,
+                      ),
                     ),
                     DropdownButton(
                         value: selectedTimerValue,
+                        style: TextStyle(
+                            //te
+                            color: Colors.indigoAccent, //Font color
+                            fontSize: 15 //font size on dropdown button
+                            ),
                         onChanged: (String? newVal) {
                           setState(() {
                             selectedTimerValue = newVal!;
@@ -537,6 +605,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                         items: timeIntervals),
                   ]),
+              SizedBox(
+                height: 20,
+              ),
               Text(
                 // ignore: prefer_interpolation_to_compose_strings
                 "Hours: " +
@@ -545,7 +616,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     _getMinutes() +
                     "  Seconds: " +
                     _getSeconds(),
-                style: Theme.of(context).textTheme.headlineMedium,
+                style: TextStyle(
+                  color: Colors.black, //Font color
+                  fontSize: 40,
+                ),
               ),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: <
                   Widget>[
@@ -625,10 +699,10 @@ class _MyHomePageState extends State<MyHomePage> {
             final quoteReceived = await openDialog();
             if (quoteReceived == null || quoteReceived.isEmpty) {
               return;
-            } else {
-              quoteToAdd = quoteReceived;
-              addQuote();
             }
+
+            quoteToAdd = quoteReceived;
+            addQuote();
           },
           tooltip: 'Add Quote',
           child: const Icon(Icons.add),
