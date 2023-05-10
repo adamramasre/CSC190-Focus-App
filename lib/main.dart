@@ -71,6 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String msgAudio = "Ocean Waves";
   String quoteToDisplay = "Never give up.";
   String data = "";
+  String selectedTimerValue = "0";
 
   var quotes = [
     'Never give up.',
@@ -344,14 +345,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<DropdownMenuItem<String>> get timeIntervals {
-    List<DropdownMenuItem<String>> menuItems = [
+    List<DropdownMenuItem<String>> intervals = [
+      DropdownMenuItem(child: Text("0 sec"), value: "0"),
       DropdownMenuItem(child: Text("1 min"), value: "60"),
       DropdownMenuItem(child: Text("5 min"), value: "300"),
       DropdownMenuItem(child: Text("30 min"), value: "1800"),
       DropdownMenuItem(child: Text("1 hr"), value: "3600"),
       DropdownMenuItem(child: Text("3 hr"), value: "10800"),
     ];
-    return menuItems;
+    return intervals;
   }
 
   String _getSeconds() {
@@ -429,6 +431,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 50),
             DropdownButton(
                 value: selectedValue,
+                style: Theme.of(context).textTheme.headlineMedium,
                 onChanged: (String? newValue) {
                   setState(() {
                     selectedValue = newValue!;
@@ -473,6 +476,22 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             SizedBox(height: 50),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              Text(
+                "Presets: ",
+                selectionColor: Colors.orange,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              DropdownButton(
+                  value: selectedTimerValue,
+                  onChanged: (String? newVal) {
+                    setState(() {
+                      selectedTimerValue = newVal!;
+                      secondsRemaining = int.parse(selectedTimerValue);
+                    });
+                  },
+                  items: timeIntervals),
+            ]),
             Text(
               // ignore: prefer_interpolation_to_compose_strings
               "Hours: " +
