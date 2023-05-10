@@ -72,13 +72,21 @@ class _MyHomePageState extends State<MyHomePage> {
   String quoteToDisplay = "Never give up.";
   String data = "";
   String selectedTimerValue = "0";
+  String quoteToAdd = "";
 
-  var quotes = [
+  List<String> quotes = [
     'Never give up.',
     'Just do it.',
     'I am inevitable.',
     'You are perfect.'
   ];
+
+  addQuote() {
+    setState(() {
+      quotes.add(quoteToAdd);
+      quoteToDisplay = quoteToAdd;
+    });
+  }
 
   fetchFileData() async {
     String responseText;
@@ -89,18 +97,21 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  late TextEditingController controller;
   @override
   void initState() {
     super.initState();
     myAudioPlayer = AudioPlayer()..setAsset("assets/audio/ocean-waves.mp3");
     myAudioPlayer.setLoopMode(LoopMode.all);
-    fetchFileData();
+    //fetchFileData();
     super.initState();
+    controller = TextEditingController();
   }
 
   @override
   void dispose() {
     myAudioPlayer.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -223,13 +234,20 @@ class _MyHomePageState extends State<MyHomePage> {
     selectedValue = updatedVal;
   }
 
+  var newRandom;
+  var prevRandom;
   void generateRandomQuote() {
     setState(() {
       final _random = new Random();
 
       // generate a random index based on the list length
       // and use it to retrieve the element
-      quoteToDisplay = quotes[_random.nextInt(quotes.length)];
+      newRandom = _random.nextInt(quotes.length);
+      while (newRandom == prevRandom) {
+        newRandom = _random.nextInt(quotes.length);
+      }
+      quoteToDisplay = quotes[newRandom];
+      prevRandom = newRandom;
     });
   }
 
@@ -374,6 +392,31 @@ class _MyHomePageState extends State<MyHomePage> {
     return "0";
   }
 
+  Future<String?> openDialog() => showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: Text('Add Quote'),
+            content: TextField(
+              autofocus: true,
+              decoration: InputDecoration(hintText: 'Enter your quote'),
+              controller: controller,
+              onSubmitted: (_) => submit(),
+            ),
+            actions: [
+              TextButton(
+                child: Text('Submit'),
+                onPressed: submit,
+              )
+            ],
+          ));
+
+  void submit() {
+    setState(() {
+      Navigator.of(context).pop(controller.text);
+      controller.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -383,64 +426,64 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        centerTitle: true,
-      ),
-      body: Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text(widget.title),
+          centerTitle: true,
+        ),
+        body: Center(
+            // Center is a layout widget. It takes a single child and positions it
+            // in the middle of the parent.
 
-          child: Container(
-        constraints: BoxConstraints.expand(),
-        decoration: BoxDecoration(
-            image: DecorationImage(
-          image: AssetImage(imageLink),
-          fit: BoxFit.cover,
-        )),
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              quoteToDisplay,
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            SizedBox(height: 20),
-            TextButton(
-                onPressed: generateRandomQuote,
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                        const Color.fromARGB(255, 227, 241, 21))),
-                child: const Text("Random Quote")),
-            SizedBox(height: 50),
-            DropdownButton(
-                value: selectedValue,
+            child: Container(
+          constraints: BoxConstraints.expand(),
+          decoration: BoxDecoration(
+              image: DecorationImage(
+            image: AssetImage(imageLink),
+            fit: BoxFit.cover,
+          )),
+          child: Column(
+            // Column is also a layout widget. It takes a list of children and
+            // arranges them vertically. By default, it sizes itself to fit its
+            // children horizontally, and tries to be as tall as its parent.
+            //
+            // Invoke "debug painting" (press "p" in the console, choose the
+            // "Toggle Debug Paint" action from the Flutter Inspector in Android
+            // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+            // to see the wireframe for each widget.
+            //
+            // Column has various properties to control how it sizes itself and
+            // how it positions its children. Here we use mainAxisAlignment to
+            // center the children vertically; the main axis here is the vertical
+            // axis because Columns are vertical (the cross axis would be
+            // horizontal).
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                quoteToDisplay, // change back after testing
                 style: Theme.of(context).textTheme.headlineMedium,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedValue = newValue!;
-                    _counter = int.parse(selectedValue);
-                    counterHelper(_counter);
-                  });
-                },
-                items: dropdownItems),
-            /*
+              ),
+              SizedBox(height: 20),
+              TextButton(
+                  onPressed: generateRandomQuote,
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          const Color.fromARGB(255, 227, 241, 21))),
+                  child: const Text("Random Quote")),
+              SizedBox(height: 50),
+              DropdownButton(
+                  value: selectedValue,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedValue = newValue!;
+                      _counter = int.parse(selectedValue);
+                      counterHelper(_counter);
+                    });
+                  },
+                  items: dropdownItems),
+              /*
             Text(
               'Track $_counter',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -449,76 +492,79 @@ class _MyHomePageState extends State<MyHomePage> {
               msgAudio,
               style: Theme.of(context).textTheme.headlineMedium,
             ),*/
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextButton(
-                    onPressed: _decrementCounter,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  TextButton(
+                      onPressed: _decrementCounter,
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 245, 139, 0))),
+                      child: const Text("Prev")),
+                  TextButton(
+                    onPressed: playButtonAudio,
                     style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
-                            const Color.fromARGB(255, 245, 139, 0))),
-                    child: const Text("Prev")),
-                TextButton(
-                  onPressed: playButtonAudio,
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          const Color.fromARGB(255, 114, 87, 236))),
-                  child: playing == true
-                      ? const Icon(Icons.pause)
-                      : const Icon(Icons.play_arrow),
-                ),
-                TextButton(
-                    onPressed: _incrementCounter,
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            const Color.fromARGB(255, 227, 241, 21))),
-                    child: const Text("Next")),
-              ],
-            ),
-            SizedBox(height: 50),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                            const Color.fromARGB(255, 114, 87, 236))),
+                    child: playing == true
+                        ? const Icon(Icons.pause)
+                        : const Icon(Icons.play_arrow),
+                  ),
+                  TextButton(
+                      onPressed: _incrementCounter,
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              const Color.fromARGB(255, 227, 241, 21))),
+                      child: const Text("Next")),
+                ],
+              ),
+              SizedBox(height: 50),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "Presets: ",
+                      selectionColor: Colors.orange,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    DropdownButton(
+                        value: selectedTimerValue,
+                        onChanged: (String? newVal) {
+                          setState(() {
+                            selectedTimerValue = newVal!;
+                            secondsRemaining = int.parse(selectedTimerValue);
+                          });
+                        },
+                        items: timeIntervals),
+                  ]),
               Text(
-                "Presets: ",
-                selectionColor: Colors.orange,
+                // ignore: prefer_interpolation_to_compose_strings
+                "Hours: " +
+                    _getHours() +
+                    "  Minutes: " +
+                    _getMinutes() +
+                    "  Seconds: " +
+                    _getSeconds(),
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-              DropdownButton(
-                  value: selectedTimerValue,
-                  onChanged: (String? newVal) {
-                    setState(() {
-                      selectedTimerValue = newVal!;
-                      secondsRemaining = int.parse(selectedTimerValue);
-                    });
-                  },
-                  items: timeIntervals),
-            ]),
-            Text(
-              // ignore: prefer_interpolation_to_compose_strings
-              "Hours: " +
-                  _getHours() +
-                  "  Minutes: " +
-                  _getMinutes() +
-                  "  Seconds: " +
-                  _getSeconds(),
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              MaterialButton(
-                onPressed: _decreaseHours,
-                child: Text('Hour', style: TextStyle(color: Colors.white)),
-                color: Colors.red[900],
-              ),
-              MaterialButton(
-                onPressed: _decreaseMinutes,
-                child: Text('Minute', style: TextStyle(color: Colors.white)),
-                color: Colors.red[900],
-              ),
-              MaterialButton(
-                onPressed: _decreaseSeconds,
-                child: Text('Second', style: TextStyle(color: Colors.white)),
-                color: Colors.red[900],
-              ),
-              /*MaterialButton(
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: <
+                  Widget>[
+                MaterialButton(
+                  onPressed: _decreaseHours,
+                  child: Text('Hour', style: TextStyle(color: Colors.white)),
+                  color: Colors.red[900],
+                ),
+                MaterialButton(
+                  onPressed: _decreaseMinutes,
+                  child: Text('Minute', style: TextStyle(color: Colors.white)),
+                  color: Colors.red[900],
+                ),
+                MaterialButton(
+                  onPressed: _decreaseSeconds,
+                  child: Text('Second', style: TextStyle(color: Colors.white)),
+                  color: Colors.red[900],
+                ),
+                /*MaterialButton(
                 onPressed: _stopTimer,
                 child: Text('Pause',
                     style: timerActive
@@ -526,39 +572,39 @@ class _MyHomePageState extends State<MyHomePage> {
                         : TextStyle(color: Colors.red)),
                 color: Colors.deepPurple,
               ), old    */
-              MaterialButton(
-                onPressed: _playPauseTimer,
-                child: Icon(
-                  !timerActive == false ? Icons.pause : Icons.play_arrow,
-                  color: Colors.white,
+                MaterialButton(
+                  onPressed: _playPauseTimer,
+                  child: Icon(
+                    !timerActive == false ? Icons.pause : Icons.play_arrow,
+                    color: Colors.white,
+                  ),
+                  color: Colors.deepPurple,
                 ),
-                color: Colors.deepPurple,
-              ),
+                MaterialButton(
+                  onPressed: _increaseSeconds,
+                  child: Text('Second', style: TextStyle(color: Colors.white)),
+                  color: Colors.lightGreen,
+                ),
+                MaterialButton(
+                  onPressed: _increaseMinutes,
+                  child: Text('Minute', style: TextStyle(color: Colors.white)),
+                  color: Colors.lightGreen,
+                ),
+                MaterialButton(
+                  onPressed: _increaseHours,
+                  child: Text('Hour', style: TextStyle(color: Colors.white)),
+                  color: Colors.lightGreen,
+                ),
+              ]),
               MaterialButton(
-                onPressed: _increaseSeconds,
-                child: Text('Second', style: TextStyle(color: Colors.white)),
-                color: Colors.lightGreen,
+                onPressed: _resetTimer,
+                child: Text('Reset', style: TextStyle(color: Colors.black)),
+                color: Colors.yellow,
               ),
-              MaterialButton(
-                onPressed: _increaseMinutes,
-                child: Text('Minute', style: TextStyle(color: Colors.white)),
-                color: Colors.lightGreen,
-              ),
-              MaterialButton(
-                onPressed: _increaseHours,
-                child: Text('Hour', style: TextStyle(color: Colors.white)),
-                color: Colors.lightGreen,
-              ),
-            ]),
-            MaterialButton(
-              onPressed: _resetTimer,
-              child: Text('Reset', style: TextStyle(color: Colors.black)),
-              color: Colors.yellow,
-            ),
-          ],
-        ),
-      )),
-      /*bottomNavigationBar: BottomNavigationBar(
+            ],
+          ),
+        )),
+        /*bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -573,12 +619,20 @@ class _MyHomePageState extends State<MyHomePage> {
         selectedItemColor: Colors.amber[800],
         onTap: selectNavigationBarIndex,
       ), PROB NOT USING BOTTOM NAV BAR */
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            final quoteReceived = await openDialog();
+            if (quoteReceived == null || quoteReceived.isEmpty) {
+              return;
+            } else {
+              quoteToAdd = quoteReceived;
+              addQuote();
+            }
+          },
+          tooltip: 'Add Quote',
+          child: const Icon(Icons.add),
+        )); // This trailing comma makes auto-formatting nicer for build methods.
   }
 }
 
