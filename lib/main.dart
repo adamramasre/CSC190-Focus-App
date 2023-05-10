@@ -72,7 +72,12 @@ class _MyHomePageState extends State<MyHomePage> {
   String quoteToDisplay = "Never give up.";
   String data = "";
 
-  var quotes = ['Never give up.','Just do it.','I am inevitable.','You are perfect.'];
+  var quotes = [
+    'Never give up.',
+    'Just do it.',
+    'I am inevitable.',
+    'You are perfect.'
+  ];
 
   fetchFileData() async {
     String responseText;
@@ -96,12 +101,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     myAudioPlayer.dispose();
     super.dispose();
-  }
-
-  T getRandomElement<T>(List<T> list) {
-    final random = new Random();
-    var i = random.nextInt(list.length);
-    return list[i];
   }
 
   void _incrementCounter() {
@@ -158,7 +157,8 @@ class _MyHomePageState extends State<MyHomePage> {
       imageLink = "assets/images/airplane.jpg";
     } else if (counterNumber == 3) {
       pauseAudio();
-      myAudioPlayer = AudioPlayer()..setAsset("assets/audio/air-conditioner.mp3");
+      myAudioPlayer = AudioPlayer()
+        ..setAsset("assets/audio/air-conditioner.mp3");
       myAudioPlayer.setLoopMode(LoopMode.one);
       msgAudio = "Air Conditioner";
       imageLink = "assets/images/air-conditioner.jpg";
@@ -222,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
     selectedValue = updatedVal;
   }
 
-  void generateRandomQuote(){
+  void generateRandomQuote() {
     setState(() {
       final _random = new Random();
 
@@ -230,41 +230,103 @@ class _MyHomePageState extends State<MyHomePage> {
       // and use it to retrieve the element
       quoteToDisplay = quotes[_random.nextInt(quotes.length)];
     });
-    
-
   }
-  int secondsRemaining = 5;
+
+  int secondsRemaining = 30;
   Timer? timer;
-  void _startCountDown(){
-    timer = Timer.periodic(Duration(seconds:1),(_){
-      if(secondsRemaining>0){
-        setState(() {
-          secondsRemaining--;
-        });
-      }
-      else{
-        _stopTimer();
-      }
+
+  var timerActive = false;
+  void _startCountDown() {
+    if (!timerActive) {
+      setState(() {
+        timerActive = true;
+      });
+
+      timer = Timer.periodic(Duration(seconds: 1), (_) {
+        if (secondsRemaining > 0) {
+          setState(() {
+            secondsRemaining--;
+          });
+        } else {
+          _stopTimer();
+          setState(() {
+            pauseAudio();
+          });
+        }
+      });
+    }
+  }
+
+  void _playPauseTimer() {
+    if (timerActive) {
+      _stopTimer();
+    } else if (!timerActive) {
+      _startCountDown();
+    }
+  }
+
+  void _stopTimer() {
+    if (timerActive) {
+      timer?.cancel();
+      setState(() {
+        timerActive = false;
+      });
+    }
+  }
+
+  void _resetTimer() {
+    _stopTimer();
+    setState(() {
+      secondsRemaining = 0;
     });
-      
   }
 
-
-  void _stopTimer(){
-    timer?.cancel();
-  }
-
-  void _increaseSeconds(){
+  void _increaseSeconds() {
     setState(() {
       secondsRemaining++;
     });
   }
 
-  void _decreaseSeconds(){
+  void _increaseMinutes() {
+    setState(() {
+      secondsRemaining += 60;
+    });
+  }
+
+  void _increaseHours() {
+    setState(() {
+      secondsRemaining += 3600;
+    });
+  }
+
+  void _decreaseSeconds() {
     setState(() {
       secondsRemaining--;
     });
-    
+  }
+
+  void _decreaseMinutes() {
+    if (secondsRemaining <= 60) {
+      setState(() {
+        secondsRemaining -= secondsRemaining;
+      });
+    } else {
+      setState(() {
+        secondsRemaining -= 60;
+      });
+    }
+  }
+
+  void _decreaseHours() {
+    if (secondsRemaining <= 3600) {
+      setState(() {
+        secondsRemaining -= secondsRemaining;
+      });
+    } else {
+      setState(() {
+        secondsRemaining -= 3600;
+      });
+    }
   }
 
   List<DropdownMenuItem<String>> get dropdownItems {
@@ -277,12 +339,38 @@ class _MyHomePageState extends State<MyHomePage> {
       DropdownMenuItem(child: Text("Birds"), value: "5"),
       DropdownMenuItem(child: Text("City"), value: "6"),
       DropdownMenuItem(child: Text("Underwater"), value: "7"),
-      
     ];
     return menuItems;
   }
 
+  List<DropdownMenuItem<String>> get timeIntervals {
+    List<DropdownMenuItem<String>> menuItems = [
+      DropdownMenuItem(child: Text("1 min"), value: "60"),
+      DropdownMenuItem(child: Text("5 min"), value: "300"),
+      DropdownMenuItem(child: Text("30 min"), value: "1800"),
+      DropdownMenuItem(child: Text("1 hr"), value: "3600"),
+      DropdownMenuItem(child: Text("3 hr"), value: "10800"),
+    ];
+    return menuItems;
+  }
 
+  String _getSeconds() {
+    return (secondsRemaining % 60).toString();
+  }
+
+  String _getMinutes() {
+    if (secondsRemaining >= 60) {
+      return (secondsRemaining % 3600 / 60).floor().toString();
+    }
+    return "0";
+  }
+
+  String _getHours() {
+    if (secondsRemaining >= 3600) {
+      return (secondsRemaining / 3600).floor().toString();
+    }
+    return "0";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -333,11 +421,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SizedBox(height: 20),
             TextButton(
-                    onPressed: generateRandomQuote,
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            const Color.fromARGB(255, 227, 241, 21))),
-                    child: const Text("Random Quote")),
+                onPressed: generateRandomQuote,
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                        const Color.fromARGB(255, 227, 241, 21))),
+                child: const Text("Random Quote")),
             SizedBox(height: 50),
             DropdownButton(
                 value: selectedValue,
@@ -349,6 +437,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 },
                 items: dropdownItems),
+            /*
             Text(
               'Track $_counter',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -356,7 +445,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               msgAudio,
               style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            ),*/
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -365,7 +454,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(
                             const Color.fromARGB(255, 245, 139, 0))),
-                    child: const Text("Previous")),
+                    child: const Text("Prev")),
                 TextButton(
                   onPressed: playButtonAudio,
                   style: ButtonStyle(
@@ -383,56 +472,74 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: const Text("Next")),
               ],
             ),
+            SizedBox(height: 50),
             Text(
-              secondsRemaining.toString(),
+              // ignore: prefer_interpolation_to_compose_strings
+              "Hours: " +
+                  _getHours() +
+                  "  Minutes: " +
+                  _getMinutes() +
+                  "  Seconds: " +
+                  _getSeconds(),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children:<Widget>[
-                MaterialButton(
-                  onPressed: _stopTimer,
-                  child:Text(
-                    'Pause',
-                    style: secondsRemaining>0 ? TextStyle(color: Colors.green) : TextStyle(color: Colors.red)
-                  ),
-                  color: Colors.deepPurple,
-
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              MaterialButton(
+                onPressed: _decreaseHours,
+                child: Text('Hour', style: TextStyle(color: Colors.white)),
+                color: Colors.red[900],
+              ),
+              MaterialButton(
+                onPressed: _decreaseMinutes,
+                child: Text('Minute', style: TextStyle(color: Colors.white)),
+                color: Colors.red[900],
+              ),
+              MaterialButton(
+                onPressed: _decreaseSeconds,
+                child: Text('Second', style: TextStyle(color: Colors.white)),
+                color: Colors.red[900],
+              ),
+              /*MaterialButton(
+                onPressed: _stopTimer,
+                child: Text('Pause',
+                    style: timerActive
+                        ? TextStyle(color: Colors.green)
+                        : TextStyle(color: Colors.red)),
+                color: Colors.deepPurple,
+              ), old    */
+              MaterialButton(
+                onPressed: _playPauseTimer,
+                child: Icon(
+                  !timerActive == false ? Icons.pause : Icons.play_arrow,
+                  color: Colors.white,
                 ),
-                MaterialButton(
-                  onPressed: _startCountDown,
-                  child:Text(
-                    'START',
-                    style: secondsRemaining == 0 ? TextStyle(color: Colors.white) : TextStyle(color: Colors.green)
-                  ),
-                  color: Colors.deepPurple,
-
-                ),
-                MaterialButton(
-                  onPressed: _increaseSeconds,
-                  child:Text(
-                    '+Second',
-                    style: secondsRemaining == 0 ? TextStyle(color: Colors.white) : TextStyle(color: Colors.green)
-                  ),
-                  color: Colors.deepPurple,
-
-                ),
-                MaterialButton(
-                  onPressed: _decreaseSeconds,
-                  child:Text(
-                    '-Second',
-                    style: secondsRemaining == 0 ? TextStyle(color: Colors.white) : TextStyle(color: Colors.green)
-                  ),
-                  color: Colors.deepPurple,
-
-                ),
-
-              ]
-            )
+                color: Colors.deepPurple,
+              ),
+              MaterialButton(
+                onPressed: _increaseSeconds,
+                child: Text('Second', style: TextStyle(color: Colors.white)),
+                color: Colors.lightGreen,
+              ),
+              MaterialButton(
+                onPressed: _increaseMinutes,
+                child: Text('Minute', style: TextStyle(color: Colors.white)),
+                color: Colors.lightGreen,
+              ),
+              MaterialButton(
+                onPressed: _increaseHours,
+                child: Text('Hour', style: TextStyle(color: Colors.white)),
+                color: Colors.lightGreen,
+              ),
+            ]),
+            MaterialButton(
+              onPressed: _resetTimer,
+              child: Text('Reset', style: TextStyle(color: Colors.black)),
+              color: Colors.yellow,
+            ),
           ],
         ),
       )),
-      bottomNavigationBar: BottomNavigationBar(
+      /*bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -446,7 +553,7 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: selectedNavigationBarIndex,
         selectedItemColor: Colors.amber[800],
         onTap: selectNavigationBarIndex,
-      ),
+      ), PROB NOT USING BOTTOM NAV BAR */
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
